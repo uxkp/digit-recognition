@@ -60,12 +60,6 @@ def draw(window):
         for j, pixel in enumerate(row):
             pygame.draw.rect(window, (int(pixel * 255), int(pixel * 255), int(pixel * 255)), (j * 10, i * 10, 10, 10))
 
-    # drawing a 20 x 20 square, where the digit should be ideally centered.
-    pygame.draw.line(window, (15, 15, 15), (40, 40), (240, 40))
-    pygame.draw.line(window, (15, 15, 15), (40, 40), (40, 240))
-    pygame.draw.line(window, (15, 15, 15), (240, 40), (240, 240))
-    pygame.draw.line(window, (15, 15, 15), (40, 240), (240, 240))
-
     pygame.display.update()
 
 # main function, which renders everything onto the window, consisting of the main loop which refreshes at 60fps.
