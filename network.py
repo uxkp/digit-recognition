@@ -1,0 +1,2 @@
+def guess(matrix):
+    pass
