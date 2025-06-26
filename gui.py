@@ -36,9 +36,7 @@ def clear():
 # pushes the matrix into a txt file, which can be accessed by the neural network later.
 def push():
     print(f"The digit drawn, is: {guess(matrix)}")
-
-    # clearing the matrix after a user submits a digit drawn.
-    clear()
+    clear()  # clearing the matrix after a user submits a digit drawn.
 
 # drawing the 28 x 28 pixels with their appropriate grayscale colors.
 def draw(window):
@@ -49,8 +47,8 @@ def draw(window):
     if pygame.mouse.get_pressed()[0]:
         mouse_x, mouse_y = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]
         pixel_x, pixel_y = mouse_x // 10, mouse_y // 10
-        for dx in range(-2, 3):
-            for dy in range(-2, 3):
+        for dx in range(-1, 2):
+            for dy in range(-1, 2):
                 nx, ny = pixel_x + dx, pixel_y + dy
                 if 0 <= nx < WIDTH // 10 and 0 <= ny < HEIGHT // 10:
                     dist = (dx ** 2 + dy ** 2) ** 0.5

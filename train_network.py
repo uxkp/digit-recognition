@@ -165,7 +165,7 @@ def softmax(zs):
 def evaluate(data):
     correct = 0
     for x, label in data:
-        forward(x)
+        forward(x, activations, weights, biases)
         prediction = activations[3].index(max(activations[3]))
         if prediction == label:
             correct += 1
@@ -193,5 +193,5 @@ def save_model(weights, biases, epoch, accuracy):
 
 if __name__ == "__main__":
     training_data = load_data("./data/mnist_train.csv")[:10000]
-    test_data = load_data("./data/mnist_test.csv") 
-    gradient_descent(training_data, test_data, epochs = 30, learning_rate = 0.01)
+    test_data = load_data("./data/mnist_test.csv")[:1000]
+    gradient_descent(training_data, test_data, epochs = 30, learning_rate = 0.005)
