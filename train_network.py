@@ -85,7 +85,7 @@ def gradient_descent(training_data, test_data, epochs, learning_rate):
         random.shuffle(training_data)  # shuffle samples
 
         for input_layer, label in training_data:
-            forward(input_layer)  # updates activations/zs
+            forward(input_layer, activations, weights, biases)  # updates activations/zs
             backpropogation(target_list(label))  # computes gradient
             update_weights(learning_rate)  # applies gradient
 
@@ -94,7 +94,7 @@ def gradient_descent(training_data, test_data, epochs, learning_rate):
         save_model(weights, biases, epoch, accuracy)
 
 # forward propogation.
-def forward(data_input_layer):
+def forward(data_input_layer, activations, weights, biases):
     # input layer
     activations[0] = data_input_layer
 
@@ -192,6 +192,6 @@ def save_model(weights, biases, epoch, accuracy):
         json.dump({"weights": weights, "biases": biases }, f)
 
 if __name__ == "__main__":
-    training_data = load_data("./data/mnist_train.csv")[:40000]  # only uses 20000 out of 60000 training digits.
-    test_data = load_data("./data/mnist_test.csv")[:5000]  # only uses 5000 out of 10000 test digits.
-    gradient_descent(training_data, test_data, epochs = 30, learning_rate = 0.005)
+    training_data = load_data("./data/mnist_train.csv")[:10000]
+    test_data = load_data("./data/mnist_test.csv") 
+    gradient_descent(training_data, test_data, epochs = 30, learning_rate = 0.01)

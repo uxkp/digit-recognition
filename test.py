@@ -1,61 +1,42 @@
 # importing a library pygame, for handling gui and opening a window for the user to interact with.
+import random
 import pygame
-from network import guess
 
 # initialise pygame
 pygame.init()
 
 # global constants
 WIDTH, HEIGHT = 280, 280
-NEURONS = 784
 FPS = 60
-RADIUS = 1.5
-BRUSH_RATE = 1
 BACKGROUND_COLOR = (255, 255, 255)
+
+def reshape_to_matrix(flat_list):
+    assert len(flat_list) == 784, "Input must be a list of 784 values"
+    return [flat_list[i*28:(i+1)*28] for i in range(28)]
 
 # setting up a pygame window and its title.
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Digit Demo")
 
+# loading the mnist data.
+def load_data(filename):
+    data = []
+    with open(filename, "r") as f:
+        next(f)
+        for line in f:
+            parts = line.strip().split(",")
+            pixels = [int(x) / 255.0 for x in parts[1:]]  # normalize
+            data.append(pixels)
+    return data
+
 # initialising the matrix, which is going to store the values of each pixels.
-matrix = []
-
-# making the matrix a 28 x 28 zero matrix.
-for y in range(HEIGHT // 10):
-    matrix.append([])
-    for x in range(WIDTH // 10):
-        matrix[y].append(0)
-
-# a function, to clear the matrix by making all the values zero
-def clear():
-    for i in range(WIDTH // 10):
-        for j in range(HEIGHT // 10):
-            matrix[i][j] = 0
-
-# function, to handle when the user wants to submit a digit drawn.
-# pushes the matrix into a txt file, which can be accessed by the neural network later.
-def push():
-    print(f"The digit drawn, is: {guess(matrix)}")
-
-    # clearing the matrix after a user submits a digit drawn.
-    clear()
+training_data = load_data("./data/mnist_train.csv")[:100]
+matrix = reshape_to_matrix(training_data[random.randint(1, 100)])
 
 # drawing the 28 x 28 pixels with their appropriate grayscale colors.
 def draw(window):
     # refreshing the background color after every frame.
     window.fill(BACKGROUND_COLOR)
-
-    # handling mouse strokes.
-    if pygame.mouse.get_pressed()[0]:
-        mouse_x, mouse_y = pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]
-        pixel_x, pixel_y = mouse_x // 10, mouse_y // 10
-        for dx in range(-2, 3):
-            for dy in range(-2, 3):
-                nx, ny = pixel_x + dx, pixel_y + dy
-                if 0 <= nx < WIDTH // 10 and 0 <= ny < HEIGHT // 10:
-                    dist = (dx ** 2 + dy ** 2) ** 0.5
-                    strength = max(0, 1 - dist / RADIUS)
-                    matrix[ny][nx] = min(1, matrix[ny][nx] + strength * BRUSH_RATE)
 
     # drawing the pixels in their appropriate positions.
     for i, row in enumerate(matrix):
@@ -87,14 +68,6 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
                 break
-            
-            # functionailty for clearing the drawing screen.
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_c:
-                clear()
-
-            # functionality for submitting a drawn digit, by pressing the 'enter' key.
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                push()
     
     # quiting the window after the main loop is exited
     pygame.quit()
