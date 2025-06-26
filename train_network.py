@@ -1,12 +1,12 @@
 import random  # for initialising weights
 from math import sqrt, exp
-import json
+import json  # for exporting weights/biases.
 
 # layer sizes
-input_size = 784
+input_size = 784  # 28 x 28 (number of pixels on the digit grid)
 hidden1_size = 16
 hidden2_size = 16
-output_size = 10
+output_size = 10  # 1 to 9
 
 # activations for each layer
 activations = [
@@ -23,7 +23,7 @@ zs = [
     [0.0 for _ in range(output_size)]  # z for output layer
 ]
 
-# He initialisation of weights
+# He initialisation of weights (good for ReLU neural nets)
 weights = [
     [  # input to hidden layer 1 
         [random.gauss(0, sqrt(2 / input_size)) for _ in range(input_size)]
@@ -39,12 +39,14 @@ weights = [
     ]
 ]
 
+# initialising biases
 biases = [
     [0.0 for _ in range(hidden1_size)],  # for hidden layer 1
     [0.0 for _ in range(hidden2_size)],  # for hidden layer 2
     [0.0 for _ in range(output_size)]    # for output layer
 ]
 
+# gradient initialisation
 delta_weights = [
     [[0.0 for _ in range(len(weights[i][0]))] for _ in range(len(weights[i]))]
     for i in range(3)
@@ -61,7 +63,7 @@ def relu(x): return max(0, x)
 # derivative of ReLU(x)
 def relu_prime(x): return 0 if x <= 0 else 1
 
-# loading mnist data
+# loading the mnist data.
 def load_data(filename):
     data = []
     with open(filename, "r") as f:
@@ -71,10 +73,14 @@ def load_data(filename):
             label = int(parts[0])
             pixels = [int(x) / 255.0 for x in parts[1:]]  # normalize
             data.append((pixels, label))
+    if filename == "./data/mnist_train.csv":
+        print("Training data loaded!")
+    else:
+        print("Testing data loaded!")
     return data
 
-# stochastic gradient descent
-def gradient_descent(training_data, epochs, learning_rate):
+# gradient descent
+def gradient_descent(training_data, test_data, epochs, learning_rate):
     for epoch in range(epochs):
         random.shuffle(training_data)  # shuffle samples
 
@@ -83,14 +89,11 @@ def gradient_descent(training_data, epochs, learning_rate):
             backpropogation(target_list(label))  # computes gradient
             update_weights(learning_rate)  # applies gradient
 
-        accuracy = (evaluate(training_data[:1000]) / 1000) * 100
+        accuracy = (evaluate(test_data) / 5000) * 100
         print(f"Epoch {epoch + 1} complete | Accuracy: {accuracy:.2f}%")
+        save_model(weights, biases, epoch, accuracy)
 
-        if accuracy >= 99:
-            print(f"Reached {accuracy:.2f}% accuracy. Saving model.")
-            save_model(weights, biases)
-            break
-
+# forward propogation.
 def forward(data_input_layer):
     # input layer
     activations[0] = data_input_layer
@@ -114,6 +117,7 @@ def forward(data_input_layer):
 
     activations[3] = softmax(zs[2])  # update output layer
 
+# algorithm for computing the gradient.
 def backpropogation(target):
     global delta_weights, delta_biases
 
@@ -151,11 +155,13 @@ def backpropogation(target):
         for j in range(784):
             delta_weights[0][i][j] = delta_hidden1[i] * activations[0][j]
 
+# for the output layer.
 def softmax(zs):
     exps = [exp(z) for z in zs]
     total = sum(exps)
     return [e / total for e in exps]
 
+# test the network on the test data.
 def evaluate(data):
     correct = 0
     for x, label in data:
@@ -165,6 +171,7 @@ def evaluate(data):
             correct += 1
     return correct
 
+# delta_v = -n*grad(C)
 def update_weights(learning_rate):
     for l in range(3):
         for i in range(len(weights[l])):
@@ -172,15 +179,19 @@ def update_weights(learning_rate):
                 weights[l][i][j] -= learning_rate * delta_weights[l][i][j]
             biases[l][i] -= learning_rate * delta_biases[l][i]
 
+# the output we hoped for.
 def target_list(label):
     layer = [0.0] * 10
     layer[label] = 1.0
     return layer
 
-def save_model(weights, biases, filename="model.json"):
+# push the weights and biases in a folder, so that the model can be accessed later.
+def save_model(weights, biases, epoch, accuracy):
+    filename = f"./models/model_{epoch + 1}_accuracy_{accuracy:.2f}.json"
     with open(filename, "w") as f:
         json.dump({"weights": weights, "biases": biases }, f)
 
 if __name__ == "__main__":
-    training_data = load_data("./data/mnist_train.csv")[:10000]
-    gradient_descent(training_data, epochs = 30, learning_rate = 0.005)
+    training_data = load_data("./data/mnist_train.csv")[:40000]  # only uses 20000 out of 60000 training digits.
+    test_data = load_data("./data/mnist_test.csv")[:5000]  # only uses 5000 out of 10000 test digits.
+    gradient_descent(training_data, test_data, epochs = 30, learning_rate = 0.005)
