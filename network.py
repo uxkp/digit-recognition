@@ -9,7 +9,7 @@ activations = [
     [0.0 for _ in range(10)]  # output layer
 ]
 
-with open('./models/model_9_accuracy_93.40.json', 'r') as file:
+with open('./models/model_22_accuracy_94.66.json', 'r') as file:
     model = json.load(file)
     weights = model["weights"]
     biases = model["biases"]

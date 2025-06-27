@@ -1,6 +1,7 @@
 # importing a library pygame, for handling gui and opening a window for the user to interact with.
 import pygame
 from network import guess
+import os
 
 # initialise pygame
 pygame.init()
@@ -35,6 +36,7 @@ def clear():
 # function, to handle when the user wants to submit a digit drawn.
 # pushes the matrix into a txt file, which can be accessed by the neural network later.
 def push():
+    os.system('cls' if os.name == 'nt' else 'clear')
     print(f"The digit drawn, is: {guess(matrix)}")
     clear()  # clearing the matrix after a user submits a digit drawn.
 

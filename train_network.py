@@ -192,6 +192,6 @@ def save_model(weights, biases, epoch, accuracy):
         json.dump({"weights": weights, "biases": biases }, f)
 
 if __name__ == "__main__":
-    training_data = load_data("./data/mnist_train.csv")[:10000]
-    test_data = load_data("./data/mnist_test.csv")[:1000]
+    training_data = load_data("./data/mnist_train.csv")
+    test_data = load_data("./data/mnist_test.csv")[:5000]
     gradient_descent(training_data, test_data, epochs = 30, learning_rate = 0.005)
